@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro de Pintinho</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Estilos opcionais para a página */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        label, input, textarea {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        #anilhasMachoContainer,
+        #anilhasFemeaContainer {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 class="text-center mb-4">Cadastro de Novo Pintinho</h1>
+    </header>
+    <div class="container">
+        <form id="meuFormulario">
+            <!-- Campos de cadastro existentes -->
+            <div class="form-group">
+                <label for="nomeReprodutor">Nome do Reprodutor:</label>
+                <input type="text" class="form-control" id="nomeReprodutor" name="nomeReprodutor">
+            </div>
+
+            <div class="form-group">
+                <label for="matriz">Matriz:</label>
+                <input type="text" class="form-control" id="matriz" name="matriz">
+            </div>
+
+            <div class="form-group">
+                <label for="dataNascimento">Data de Nascimento:</label>
+                <input type="date" class="form-control" id="dataNascimento" name="dataNascimento">
+            </div>
+
+            <div class="form-group">
+                <label for="quantidadeTotal">Quantidade Total:</label>
+                <input type="number" class="form-control" id="quantidadeTotal" name="quantidadeTotal">
+            </div>
+
+            <div class="form-group">
+                <label for="quantidadeMachos">Quantidade de Machos:</label>
+                <input type="number" class="form-control" id="quantidadeMachos" name="quantidadeMachos">
+            </div>
+            
+            <div class="form-group">
+                <label for="quantidadeFemeas">Quantidade de Fêmeas:</label>
+                <input type="number" class="form-control" id="quantidadeFemeas" name="quantidadeFemeas">
+            </div>
+
+            <!-- Campo de anotações -->
+            <div class="form-group">
+                <label for="anotacoes">Anotações:</label>
+                <textarea id="anotacoes" class="form-control" name="anotacoes" rows="4"></textarea>
+            </div>
+
+            <!-- Campos de anilhas para machos -->
+            <div id="anilhasMachoContainer"></div>
+
+            <!-- Campos de anilhas para fêmeas -->
+            <div id="anilhasFemeaContainer"></div>
+
+            <button type="submit" class="btn btn-primary">Cadastrar Pintinho</button>
+            <button type="button" class="btn btn-secondary" onclick="goToIndex()">Voltar para o Início</button>
+        </form>
+        <div id="successMessage" class="mt-4 d-none alert alert-success" role="alert">
+            Cadastro realizado com sucesso!
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('meuFormulario').addEventListener('submit', function(event) {
+            event.preventDefault();
+        
+            const nomeReprodutor = document.getElementById('nomeReprodutor').value;
+            const matriz = document.getElementById('matriz').value;
+            const dataNascimento = document.getElementById('dataNascimento').value;
+            const quantidadeTotal = document.getElementById('quantidadeTotal').value;
+            const quantidadeMachos = parseInt(document.getElementById('quantidadeMachos').value);
+            const quantidadeFemeas = parseInt(document.getElementById('quantidadeFemeas').value);
+        
+            const anilhasMachos = [];
+            for (let i = 1; i <= quantidadeMachos; i++) {
+                const anilhaMacho = document.getElementById(`anilhaMacho${i}`).value;
+                anilhasMachos.push(anilhaMacho);
+            }
+        
+            const anilhasFemeas = [];
+            for (let i = 1; i <= quantidadeFemeas; i++) {
+                const anilhaFemea = document.getElementById(`anilhaFemea${i}`).value;
+                anilhasFemeas.push(anilhaFemea);
+            }
+        
+            const data = {
+                nomeReprodutor,
+                matriz,
+                dataNascimento,
+                quantidadeTotal,
+                quantidadeMachos,
+                quantidadeFemeas,
+                anilhasMachos,
+                anilhasFemeas
+            };
+        
+            fetch('http://localhost:8080/api/v1/chick', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao enviar os dados');
+                }
+                document.getElementById('successMessage').classList.remove('d-none');
+                return response.json();
+            })
+            .then(responseData => {
+                console.log('Dados enviados com sucesso:', responseData);
+                // Faça algo com a resposta da API, se necessário
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                // Lida com o erro da requisição, se necessário
+            });
+        });
+
+        document.getElementById('quantidadeMachos').addEventListener('input', function() {
+            const quantidadeMachos = parseInt(this.value);
+            criarCamposAnilhasMacho(quantidadeMachos);
+        });
+
+        document.getElementById('quantidadeFemeas').addEventListener('input', function() {
+            const quantidadeFemeas = parseInt(this.value);
+            criarCamposAnilhasFemea(quantidadeFemeas);
+        });
+
+        function criarCamposAnilhasMacho(quantidade) {
+            const anilhasMachoContainer = document.getElementById('anilhasMachoContainer');
+            anilhasMachoContainer.innerHTML = '';
+
+            for (let i = 1; i <= quantidade; i++) {
+                const inputAnilha = document.createElement('input');
+                inputAnilha.type = 'text';
+                inputAnilha.classList.add('form-control');
+                inputAnilha.id = `anilhaMacho${i}`;
+                inputAnilha.name = `anilhaMacho${i}`;
+                inputAnilha.placeholder = `Anilha Macho ${i}`;
+                anilhasMachoContainer.appendChild(inputAnilha);
+            }
+        }
+
+        function criarCamposAnilhasFemea(quantidade) {
+            const anilhasFemeaContainer = document.getElementById('anilhasFemeaContainer');
+            anilhasFemeaContainer.innerHTML = '';
+
+            for (let i = 1; i <= quantidade; i++) {
+                const inputAnilha = document.createElement('input');
+                inputAnilha.type = 'text';
+                inputAnilha.classList.add('form-control');
+                inputAnilha.id = `anilhaFemea${i}`;
+                inputAnilha.name = `anilhaFemea${i}`;
+                inputAnilha.placeholder = `Anilha Fêmea ${i}`;
+                anilhasFemeaContainer.appendChild(inputAnilha);
+            }
+        }
+
+        function goToIndex() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

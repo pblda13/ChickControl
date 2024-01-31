@@ -1,0 +1,34 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding-top: 60px;
+    background-image: url('1.png'); /* Substitua pelo caminho da sua imagem */
+    background-size: cover; /* Ajusta a imagem para cobrir todo o corpo */
+    opacity: 1; /* Ajuste a opacidade conforme necessário para suavizar a imagem */
+    color: white;
+}
+
+
+header {
+    background-color: #f8f9fa;
+    padding: 20px 0;
+    text-align: center;
+    color: black;
+}
+
+nav {
+    background-color: #E1B16A;
+    padding: 10px 0;
+}
+
+nav a {
+    color: white;
+    margin: 0 10px;
+    text-decoration: none;
+}
+
+main {
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.2); /* Ajuste a opacidade do background do main */
+    background-size: cover;
+}

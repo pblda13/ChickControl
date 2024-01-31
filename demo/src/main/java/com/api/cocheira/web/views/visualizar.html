@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Visualização de Pintinhos</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Estilos adicionais */
+        .details-row {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4 mb-4">Lista de Pintinhos</h1>
+
+        <table class="table">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Nome do Reprodutor</th>
+                    <th scope="col">Matriz</th>
+                    <th scope="col">Data de Nascimento</th>
+                    <th scope="col">Quantidade Total</th>
+                    <th scope="col">Quantidade de Machos</th>
+                    <th scope="col">Quantidade de Fêmeas</th>
+                    <th scope="col">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="corpoTabela"></tbody>
+        </table>
+
+        <button class="btn btn-primary" onclick="goToIndex()">Voltar para o Index</button>
+    </div>
+
+    <!-- Bootstrap JS (requer jQuery) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        function createDetailsRow(pintinho) {
+            const row = document.createElement('tr');
+            row.classList.add('details-row');
+            row.innerHTML = `
+                <td colspan="6">
+                    <strong>Anotações:</strong> ${pintinho.anotacoes}<br>
+                    <strong>Anilhas Machos:</strong> ${pintinho.anilhasMachos.join(', ')}<br>
+                    <strong>Anilhas Fêmeas:</strong> ${pintinho.anilhasFemeas.join(', ')}
+                </td>
+                <td>
+                    <button class="btn btn-danger btn-sm" onclick="confirmDelete(this)">Excluir</button>
+                    <button class="btn btn-warning btn-sm" onclick="goToEditPage(${pintinho.id})">Editar</button>
+                </td>
+            `;
+            return row;
+        }
+
+        function goToIndex() {
+            window.location.href = 'index.html';
+        }
+
+        function confirmDelete(button) {
+            const confirmDelete = confirm('Tem certeza que deseja excluir?');
+            if (confirmDelete) {
+                const row = button.parentNode.parentNode;
+                row.remove();
+                // Simulação de exclusão (aqui, normalmente você faria uma requisição para deletar do backend)
+            }
+        }
+
+        function goToEditPage(id) {
+            window.location.href = `edit.html?id=${id}`;
+            // Redirecionamento para a página de edição com o ID do pintinho
+            // Você pode passar o ID para a página de edição via URL para carregar os dados específicos para edição
+        }
+
+        fetch('http://localhost:8080/api/v1/chick')
+        .then(response => response.json())
+        .then(data => {
+            const corpoTabela = document.getElementById('corpoTabela');
+            data.forEach(pintinho => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${pintinho.nomeReprodutor}</td>
+                    <td>${pintinho.matriz}</td>
+                    <td>${pintinho.dataNascimento}</td>
+                    <td>${pintinho.quantidadeTotal}</td>
+                    <td>${pintinho.quantidadeMachos}</td>
+                    <td>${pintinho.quantidadeFemeas}</td>
+                    <td>
+                        <button class="btn btn-secondary btn-sm" onclick="toggleDetails(this)">Detalhes</button>
+                    </td>
+                `;
+                corpoTabela.appendChild(row);
+                const detailsRow = createDetailsRow(pintinho);
+                corpoTabela.appendChild(detailsRow);
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao buscar pintinhos:', error);
+            alert('Ocorreu um erro ao buscar os pintinhos.');
+        });
+
+        function toggleDetails(button) {
+            const detailsRow = button.parentNode.parentNode.nextSibling;
+            if (detailsRow.classList.contains('details-row')) {
+                detailsRow.style.display = detailsRow.style.display === 'none' ? 'table-row' : 'none';
+            }
+        }
+    </script>
+</body>
+</html>
